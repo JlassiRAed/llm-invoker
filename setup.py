@@ -32,11 +32,11 @@ setup(
     name="multiagent-failover-invoke",
     version="0.1.0",
     author="Raed Jlassi",
-    author_email="your.email@example.com",  # Remplacez par votre email
-    description="MultiAgent Failover Invoke - Robust LLM invocation with failover strategies",
+    author_email="raed.jlassi@etudiant-enit.utm.tn", 
+    description="llm-invoker - Robust LLM invocation with failover strategies",
     long_description=read_long_description(),
     long_description_content_type="text/markdown",
-    url="https://github.com/raedjlassi/multiagent-failover-invoke",  # Remplacez par votre URL
+    url="https://github.com/JlassiRAed/llm-invoker",  
     packages=find_packages(),
     classifiers=[
         "Development Status :: 3 - Alpha",
@@ -64,7 +64,7 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "llm-invoke=llmInvoker.cli:main",  # Si vous avez un CLI
+            "llm-invoke=llmInvoker.cli:main", 
         ],
     },
     include_package_data=True,

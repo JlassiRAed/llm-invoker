@@ -3,25 +3,23 @@ name: Build and Publish to PyPI
 on:
   push:
     tags:
-      - 'v*'  # Trigger on version tags like v0.1.0
+      - 'v*' 
   release:
     types: [published]
-  workflow_dispatch:  # Allow manual trigger
+  workflow_dispatch: 
 
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     
     steps:
     - uses: actions/checkout@v4
     
     - name: Install uv
       uses: astral-sh/setup-uv@v4
-      with:
-        version: "latest"
     
     - name: Set up Python ${{ matrix.python-version }}
       run: uv python install ${{ matrix.python-version }}
@@ -36,7 +34,9 @@ jobs:
         
     - name: Run linting (optional)
       run: |
-        uv run python -m flake8 llmInvoker/ --count --select=E9,F63,F7,F82 --show-source --statistics || true
+        uv run black --check .
+        uv run flake8 .
+        uv run mypy llmInvoker/
 
   build:
     needs: test
@@ -47,8 +47,6 @@ jobs:
     
     - name: Install uv
       uses: astral-sh/setup-uv@v4
-      with:
-        version: "latest"
     
     - name: Set up Python
       run: uv python install 3.11
@@ -58,9 +56,9 @@ jobs:
         
     - name: Build package
       run: |
-        uv build
+        uv run python -m build
         
-    - name: Upload build artifacts
+    - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
         name: dist
@@ -69,54 +67,42 @@ jobs:
   publish-testpypi:
     needs: build
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && contains(github.ref, 'refs/tags/'))
+    if: github.event_name == 'workflow_dispatch' || contains(github.ref, 'refs/tags/')
     
     steps:
     - uses: actions/checkout@v4
     
-    - name: Download build artifacts
+    - name: Download artifacts
       uses: actions/download-artifact@v4
       with:
         name: dist
         path: dist/
     
-    - name: Install uv
-      uses: astral-sh/setup-uv@v4
-      with:
-        version: "latest"
-    
     - name: Publish to TestPyPI
-      env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.TEST_PYPI_TOKEN }}
-      run: |
-        uv tool install twine
-        uv tool run twine upload --repository testpypi dist/*
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        repository-url: https://test.pypi.org/legacy/
+        password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+        skip-existing: true
 
   publish-pypi:
     needs: [build, publish-testpypi]
     runs-on: ubuntu-latest
-    if: github.event_name == 'release' && github.event.action == 'published'
-    environment: production  # Requires manual approval
+    if: github.event_name == 'release' || (github.event_name == 'push' && contains(github.ref, 'refs/tags/'))
+    environment: 
+      name: pypi
+      url: https://pypi.org/p/llm-invoker
     
     steps:
     - uses: actions/checkout@v4
     
-    - name: Download build artifacts
+    - name: Download artifacts
       uses: actions/download-artifact@v4
       with:
         name: dist
         path: dist/
     
-    - name: Install uv
-      uses: astral-sh/setup-uv@v4
-      with:
-        version: "latest"
-    
     - name: Publish to PyPI
-      env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
-      run: |
-        uv tool install twine
-        uv tool run twine upload dist/*
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        password: ${{ secrets.PYPI_API_TOKEN }}
