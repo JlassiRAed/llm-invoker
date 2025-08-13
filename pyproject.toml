@@ -1,0 +1,68 @@
+[project]
+name = "llm-invoker"
+version = "0.1.0"
+description = "A Python library for managing multi-agent model invocation with automatic failover strategies"
+readme = "README.md"
+authors = [
+    { name = "Jlassi Raed", email = "raed.jlassi@etudiant-enit.utm.tn" }
+]
+license = { text = "MIT" }
+requires-python = ">=3.9"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+keywords = ["ai", "llm", "openai", "anthropic", "github", "google", "failover", "multiagent"]
+
+dependencies = [
+    "langchain>=0.1.0",
+    "langsmith>=0.1.0",
+    "openai>=1.0.0",
+    "anthropic>=0.25.0",
+    "google-generativeai>=0.3.0",
+    "requests>=2.25.1",
+    "python-dotenv>=0.19.1",
+    "aiohttp>=3.8.0",
+    "asyncio-throttle>=1.0.0",
+    "typing-extensions>=4.0.0",
+    "setuptools>=80.9.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-mock>=3.10.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/RaedJlassi/llm-invoker"
+Repository = "https://github.com/RaedJlassi/llm-invoker"
+Documentation = "https://github.com/RaedJlassi/llm-invoker#readme"
+Issues = "https://github.com/RaedJlassi/llm-invoker/issues"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["llmInvoker"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-mock>=3.10.0",
+]
