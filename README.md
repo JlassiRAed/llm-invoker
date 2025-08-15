@@ -475,15 +475,15 @@ The `examples/` directory contains comprehensive examples:
 
 ## 📞 Support & Community
 
-- **Issues**: [GitHub Issues](https://github.com/RaedJlassi/llm-invoker/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/RaedJlassi/llm-invoker/discussions)
+- **Issues**: [GitHub Issues](https://github.com/JlassiRAed/llm-invoker/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/JlassiRAed/llm-invoker/discussions)
 - **Documentation**: Comprehensive examples in the `examples/` directory
 
 ## 👨‍💻 Author
 
 **Jlassi Raed**
 - Email: raed.jlassi@etudiant-enit.utm.tn
-- GitHub: [@RaedJlassi](https://github.com/RaedJlassi)
+- GitHub: [@RaedJlassi](https://github.com/JlassiRAed)
 
 *Created during multi-agent system development at ENIT (École Nationale d'Ingénieurs de Tunis) to solve real-world rate limiting and provider reliability challenges in POC phase.*
 

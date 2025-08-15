@@ -29,8 +29,8 @@ def read_long_description():
     return ""
 
 setup(
-    name="multiagent-failover-invoke",
-    version="0.1.0",
+    name="llm-invoker",
+    version="0.1.1",
     author="Raed Jlassi",
     author_email="raed.jlassi@etudiant-enit.utm.tn", 
     description="llm-invoker - Robust LLM invocation with failover strategies",

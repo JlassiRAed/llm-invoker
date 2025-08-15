@@ -1,6 +1,6 @@
 [project]
 name = "llm-invoker"
-version = "0.1.0"
+version = "0.1.3"
 description = "A Python library for managing multi-agent model invocation with automatic failover strategies"
 readme = "README.md"
 authors = [
@@ -49,10 +49,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/RaedJlassi/llm-invoker"
-Repository = "https://github.com/RaedJlassi/llm-invoker"
-Documentation = "https://github.com/RaedJlassi/llm-invoker#readme"
-Issues = "https://github.com/RaedJlassi/llm-invoker/issues"
+Homepage = "https://github.com/JlassiRAed/llm-invoker"
+Repository = "https://github.com/JlassiRAed/llm-invoker"
+Documentation = "https://github.com/JlassiRAed/llm-invoker/#readme"
+Issues = "https://github.com/JlassiRAed/llm-invoker/issues"
 
 [build-system]
 requires = ["hatchling"]
