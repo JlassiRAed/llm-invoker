@@ -385,16 +385,37 @@ multiagent_failover_invoke/
 └── README.md               # This file
 ```
 
-### Supported Providers
+## 🔧 Supported Providers
 
-| Provider | Models | Free Tier | Rate Limits |
-|----------|--------|-----------|-------------|
-| GitHub Models | gpt-4o, gpt-4o-mini | ✅ | High |
-| OpenRouter | deepseek/deepseek-r1, llama-3.2-3b:free | ✅ | Medium |
-| Google AI | gemini-2.0-flash-exp, gemini-1.5-pro | ✅ | Medium |
-| Hugging Face | Various open models | ✅ | Variable |
-| OpenAI | gpt-4o, gpt-4o-mini, gpt-3.5-turbo | 💰 | High |
-| Anthropic | claude-3-5-haiku, claude-3-haiku | 💰 | High |
+llm-invoker supports **6 major AI providers** with automatic failover between them:
+
+### **Providers & Models**
+
+| Provider | Models Supported | API Key Required | Status |
+|----------|------------------|------------------|--------|
+| **OpenAI** | `gpt-4o`, `gpt-4o-mini`, `gpt-4-turbo`, `gpt-3.5-turbo` | `OPENAI_API_KEY` | ✅ Active |
+| **Anthropic** | `claude-3-5-sonnet-20241022`, `claude-3-haiku`, `claude-3-opus` | `ANTHROPIC_API_KEY` | ✅ Active |
+| **GitHub Models** | `gpt-4o`, `gpt-4o-mini` | `GITHUB_TOKEN` | ✅ Active |
+| **Google AI** | `gemini-2.0-flash-exp`, `gemini-1.5-pro`, `gemini-1.5-flash` | `GOOGLE_API_KEY` | ✅ Active |
+| **OpenRouter** | `anthropic/claude-3.5-sonnet`, `openai/gpt-4o` | `OPENROUTER_API_KEY` | ✅ Active |
+| **Hugging Face** | Any text-generation model | `HUGGINGFACE_API_KEY` | ✅ Active |
+
+### **Configuration Example**
+
+```python
+from llmInvoker import llmInvoker
+
+# Configure multiple providers for failover
+invoker = llmInvoker(strategy="failover")
+invoker.configure_providers(
+    openai=["gpt-4o", "gpt-4o-mini"],
+    anthropic=["claude-3-5-sonnet-20241022"],
+    github=["gpt-4o"],
+    google=["gemini-2.0-flash-exp"],
+    openrouter=["anthropic/claude-3.5-sonnet"],
+    huggingface=["microsoft/DialoGPT-medium"]
+)
+```
 
 ## 🤝 Use Cases
 

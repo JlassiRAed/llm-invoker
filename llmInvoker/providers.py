@@ -252,7 +252,7 @@ class OpenRouterProvider(BaseProvider):
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
             "HTTP-Referer": "https://github.com/multiagent_failover_invoke",
-            "X-Title": "MultiAgent Failover Invoke"
+            "X-Title": "llm-Invoker"
         }
         
         data = {
