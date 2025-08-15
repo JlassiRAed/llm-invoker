@@ -215,28 +215,127 @@ class GoogleProvider(BaseProvider):
     def _get_base_url(self) -> str:
         return "https://generativelanguage.googleapis.com/v1beta"
     
+    async def invoke(self, model: str, messages: Union[str, List[Dict], Dict], **kwargs) -> Dict[str, Any]:
+        """Override invoke to handle Google-specific response format."""
+        if isinstance(messages, str):
+            messages = [{"role": "user", "content": messages}]
+        elif isinstance(messages, dict):
+            messages = [messages]
+        
+        # Handle multimodal content
+        processed_messages = self._process_multimodal_messages(messages)
+        
+        try:
+            raw_response = await self._make_request(model, processed_messages, **kwargs)
+            
+            # Extract text from Google's response format
+            response_text = self._extract_text_from_response(raw_response)
+            
+            # Log token usage if available
+            if 'usageMetadata' in raw_response:
+                usage = raw_response['usageMetadata']
+                log_token_usage(self.name, model, {
+                    'prompt_tokens': usage.get('promptTokenCount', 0),
+                    'completion_tokens': usage.get('candidatesTokenCount', 0),
+                    'total_tokens': usage.get('totalTokenCount', 0)
+                })
+            
+            return {
+                'provider': self.name,
+                'model': model,
+                'response': response_text,
+                'success': True,
+                'raw_response': raw_response
+            }
+        except Exception as e:
+            error_str = str(e)
+            
+            if is_rate_limit_error(error_str):
+                logger.warning(f"Rate limit detected for {self.name}:{model}. Triggering failover.")
+                raise Exception(f"Rate limit exceeded for {self.name}:{model}")
+            
+            logger.error(f"Provider {self.name}:{model} error: {e}")
+            return {
+                'provider': self.name,
+                'model': model,
+                'error': error_str,
+                'success': False
+            }
+    
+    def _extract_text_from_response(self, response: Dict[str, Any]) -> str:
+        """Extract text from Google's response format."""
+        try:
+            if 'candidates' in response and len(response['candidates']) > 0:
+                candidate = response['candidates'][0]
+                if 'content' in candidate and 'parts' in candidate['content']:
+                    parts = candidate['content']['parts']
+                    if len(parts) > 0 and 'text' in parts[0]:
+                        return parts[0]['text'].strip()
+            
+            # Fallback extraction
+            return str(response.get('text', str(response)))
+            
+        except Exception as e:
+            logger.warning(f"Failed to extract text from Google response: {e}")
+            return str(response)
+    
     async def _make_request(self, model: str, messages: List[Dict], **kwargs) -> Dict[str, Any]:
         url = f"{self.base_url}/models/{model}:generateContent"
         params = {"key": self.api_key}
         
-        # Convert messages to Google format
+        # Convert messages to Google format - Fix for proper conversation handling
         contents = []
         for msg in messages:
-            contents.append({
-                "parts": [{"text": msg["content"]}],
-                "role": "user" if msg["role"] == "user" else "model"
-            })
+            # Google expects specific role mapping
+            if msg["role"] == "user":
+                contents.append({
+                    "parts": [{"text": msg["content"]}],
+                    "role": "user"
+                })
+            elif msg["role"] == "assistant":
+                contents.append({
+                    "parts": [{"text": msg["content"]}],
+                    "role": "model"
+                })
+            elif msg["role"] == "system":
+                # For system messages, prepend to first user message or create user message
+                if contents and contents[-1]["role"] == "user":
+                    contents[-1]["parts"][0]["text"] = f"{msg['content']}\n\n{contents[-1]['parts'][0]['text']}"
+                else:
+                    contents.append({
+                        "parts": [{"text": msg["content"]}],
+                        "role": "user"
+                    })
+        
+        # Ensure we have at least one message and it's a user message
+        if not contents:
+            contents = [{"parts": [{"text": "Hello"}], "role": "user"}]
+        elif contents[0]["role"] != "user":
+            contents.insert(0, {"parts": [{"text": "Hello"}], "role": "user"})
         
         data = {
             "contents": contents,
-            **kwargs
+            "generationConfig": {
+                "temperature": kwargs.get("temperature", 1.0),
+                "topP": kwargs.get("top_p", 0.95),
+                "topK": kwargs.get("top_k", 40),
+                "maxOutputTokens": kwargs.get("max_tokens", 8192)
+            }
         }
         
         async with aiohttp.ClientSession() as session:
             async with session.post(url, json=data, params=params) as response:
                 if response.status == 429:
                     await handle_rate_limit(response)
-                response.raise_for_status()
+                if response.status != 200:
+                    error_text = await response.text()
+                    logger.error(f"Google API error {response.status}: {error_text}")
+                    raise aiohttp.ClientResponseError(
+                        response.request_info, 
+                        response.history, 
+                        status=response.status, 
+                        message=f"Google API error: {error_text}"
+                    )
                 return await response.json()
 
 
