@@ -66,8 +66,8 @@ async def example_2_parallel_comparison():
     # Configure with fewer providers to reduce rate limiting
     try:
         invoker.configure_providers(
-            github=["gpt-4o-mini"],  # Only use gpt-4o-mini as it has fewer rate limits
-            openrouter=["deepseek/deepseek-r1"]  # Only one OpenRouter model
+            github=["gpt-4o-mini"],  
+            openrouter=["deepseek/deepseek-r1"] 
         )
     except ValueError as e:
         print(f"⚠️  Configuration warning: {e}")
@@ -107,7 +107,7 @@ async def example_3_parallel_with_analysis():
     """Parallel invocation with response analysis."""
     print("\n=== Example 3: Response Analysis ===")
     
-    # Use fewer providers to avoid rate limiting
+   
     invoker = llmInvoker(strategy="parallel", enable_history=True)
     try:
         invoker.configure_providers(

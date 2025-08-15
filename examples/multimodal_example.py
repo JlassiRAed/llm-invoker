@@ -28,9 +28,9 @@ async def example_1_image_analysis():
     
     # Configure providers that support vision (OpenAI GPT-4V, Google Gemini)
     invoker.configure_providers(
-        openai=["gpt-4o", "gpt-4o-mini"],  # These support vision
-        google=["gemini-2.0-flash-exp"],   # Supports vision
-        anthropic=["claude-3-5-sonnet-20241022"]  # Supports vision
+        openai=["gpt-4o", "gpt-4o-mini"], 
+        google=["gemini-2.0-flash-exp"],  
+        anthropic=["claude-3-5-sonnet-20241022"]  
     )
     
     # Create multimodal message with image
